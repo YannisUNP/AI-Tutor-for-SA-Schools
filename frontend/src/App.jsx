@@ -1,6 +1,10 @@
-import React from 'react';
-import { useEffect } from 'react';
-import Landing from "./pages/Landing/Landing";
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Landing from "./pages/Landing";
+// import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+//import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 function App() {
   useEffect(() => {
@@ -20,11 +24,35 @@ function App() {
 
   return (
     <div className="bg-surface text-on-surface">
-      {/* 
-         Since your app is currently a landing page, 
-         you render the Landing page here. 
-      */}
-      <Landing />
+      <BrowserRouter>
+
+        <Routes>
+          <Route 
+            path="/"
+            element={<Landing />}
+          />
+
+          <Route 
+            path="/login"
+            element={<Login />}
+          />
+
+          <Route 
+            path="/register"
+            element={<Register />}
+          />
+
+          {/* <Route 
+            path="/dashboard"
+            element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+            }
+          /> */}
+
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }

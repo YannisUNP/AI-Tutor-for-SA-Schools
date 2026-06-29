@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 
 function Hero() {
-    return(<section className="hero-gradient pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+    return(<section className="hero-gradient pt-20 pb-20 md:pt-24 md:pb-32 overflow-hidden">
         <div className="max-w-container-max mx-auto px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-stack-lg items-center">
             <div className="flex flex-col space-y-stack-md">
                 <div className="inline-flex items-center bg-surface-container px-4 py-1.5 rounded-full w-fit">
-                    <span className="text-primary font-label-md text-label-md">New: IEB Past Papers 2024</span>
+                    <span className="text-primary font-label-md text-label-md">New: IEB Past Papers 2025</span>
                 </div>
                 <h2 className="font-display-lg text-display-lg text-primary leading-tight">
                     Learn Smarter.<br />Grow Faster.
@@ -17,10 +17,10 @@ function Hero() {
                     <button className="bg-primary text-on-primary px-8 py-4 rounded-xl font-label-md text-lg shadow-lg hover:shadow-xl transition-all active:scale-95">
                         Start Learning for Free
                     </button>
-                    <button className="flex items-center justify-center gap-2 border-2 border-outline-variant text-primary px-8 py-4 rounded-xl font-label-md text-lg hover:bg-surface-container transition-all">
+                    {/* <button className="flex items-center justify-center gap-2 border-2 border-outline-variant text-primary px-8 py-4 rounded-xl font-label-md text-lg hover:bg-surface-container transition-all">
                         <span className="material-symbols-outlined">play_circle</span>
                         See how it works
-                    </button>
+                    </button> */}
                 </div>
             </div>
             <div className="relative">

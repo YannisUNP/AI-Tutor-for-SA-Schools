@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react';
-
 function Footer(){
     return (
         <footer className="bg-surface-container-low dark:bg-surface-container-highest w-full py-12 px-margin-desktop">

@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 function Benefits () {
     return (
         <section className="py-stack-lg bg-surface-container-low/50" id="benefits">
