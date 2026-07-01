@@ -1,15 +1,68 @@
-import { useState, useEffect } from 'react';
-import Header from "../components/landing/Header";
-import Footer from "../components/landing/Footer";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Header from '../components/landing/Header';
+import Footer from '../components/landing/Footer';
+import { loginUser } from '../services/authService';
+
+const loginSchema = z.object({
+    email: z.string().min(1, 'Email is required').email('Invalid email address format'),
+    password: z.string().min(1, 'Password is required'),
+});
 
 function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [focusedInput, setFocusedInput] = useState(null);
+    const [status, setStatus] = useState('idle');
+    const [authError, setAuthError] = useState('');
+    const [formData, setFormData] = useState({
+        email: '',
+        password: '',
+        rememberMe: false,
+    });
+    const navigate = useNavigate();
 
-    const handleFocus = (id) => setFocusedInput(id);
-    const handleBlur = () => setFocusedInput(null);
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        formState: { errors, isSubmitting },
+    } = useForm({
+        resolver: zodResolver(loginSchema),
+        mode: 'onChange',
+    });
+
+    const handleFieldChange = (event) => {
+        const { name, value, type, checked } = event.target;
+        const nextValue = type === 'checkbox' ? checked : value;
+
+        setFormData((prev) => ({ ...prev, [name]: nextValue }));
+        setValue(name, nextValue, { shouldValidate: true, shouldDirty: true });
+    };
 
     const inputWrapperClass = (id) => `relative transition-transform duration-200 ${focusedInput === id ? 'scale-[1.01]' : ''}`;
+
+    const onSubmit = async (data) => {
+        setStatus('submitting');
+        setAuthError('');
+
+        try {
+            setFormData((prev) => ({ ...prev, ...data }));
+            await loginUser({
+                email: data.email,
+                password: data.password,
+            });
+            setStatus('success');
+            setTimeout(() => navigate('/dashboard'), 1000);
+        } catch (err) {
+            const message = err?.message || 'Login failed. Please try again.';
+            setAuthError(message);
+            console.error('Login failed:', message);
+            setStatus('idle');
+        }
+    };
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -17,8 +70,6 @@ function Login() {
 
             <main className="flex-grow flex items-center justify-center pt-2 pb-2 px-margin-mobile">
                 <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 bg-surface-container-lowest rounded-3xl overflow-hidden form-shadow min-h-[500px]">
-
-                    {/* Left Side: Illustration & Brand */}
                     <div className="relative hidden lg:flex flex-col justify-center items-center p-stack-lg overflow-hidden">
                         <div className="absolute inset-0 bg-primary opacity-5"></div>
                         <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
@@ -52,12 +103,15 @@ function Login() {
                                 <p className="font-body-md text-on-surface-variant">Log in to your academic dashboard</p>
                             </div>
 
-                            <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
+                            <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
                                 <div className="space-y-1">
                                     <label className="font-label-md text-label-md text-on-surface-variant px-1" htmlFor="email">Email Address</label>
                                     <div className={inputWrapperClass('email')}>
                                         <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">mail</span>
                                         <input
+                                            {...register('email')}
+                                            value={formData.email}
+                                            onChange={handleFieldChange}
                                             className="w-full pl-12 pr-4 py-4 bg-surface-container-low border-none focus:ring-2 focus:ring-primary rounded-2xl font-body-md text-on-surface placeholder:text-outline/60 transition-all"
                                             id="email"
                                             placeholder="student@example.co.za"
@@ -65,6 +119,7 @@ function Login() {
                                             onFocus={() => setFocusedInput('email')}
                                             onBlur={() => setFocusedInput(null)}
                                         />
+                                        {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
                                     </div>
                                 </div>
 
@@ -79,9 +134,12 @@ function Login() {
                                             className="w-full pl-12 pr-12 py-4 bg-surface-container-low border-none focus:ring-2 focus:ring-primary rounded-2xl font-body-md text-on-surface placeholder:text-outline/60 transition-all"
                                             id="password"
                                             placeholder="••••••••"
-                                            type={showPassword ? "text" : "password"}
+                                            type={showPassword ? 'text' : 'password'}
                                             onFocus={() => setFocusedInput('password')}
                                             onBlur={() => setFocusedInput(null)}
+                                            {...register('password')}
+                                            value={formData.password}
+                                            onChange={handleFieldChange}
                                         />
                                         <button
                                             className="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors"
@@ -90,16 +148,30 @@ function Login() {
                                         >
                                             <span className="material-symbols-outlined">{showPassword ? 'visibility_off' : 'visibility'}</span>
                                         </button>
+                                        {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>}
                                     </div>
                                 </div>
 
                                 <div className="flex items-center gap-3 px-1">
-                                    <input className="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer" id="remember" type="checkbox" />
+                                    <input className="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer" id="remember" type="checkbox" checked={formData.rememberMe} onChange={handleFieldChange} />
                                     <label className="font-body-md text-on-surface-variant cursor-pointer" htmlFor="remember">Remember me</label>
                                 </div>
 
-                                <button className="w-full py-4 bg-primary text-on-primary font-label-md text-body-lg rounded-2xl shadow-lg hover:shadow-primary/20 active:scale-[0.98] transition-all flex justify-center items-center gap-2 group" type="submit">
-                                    Login
+                                {authError && <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">{authError}</p>}
+
+                                <button
+                                    className={`w-full py-4 bg-primary text-on-primary font-label-md text-body-lg rounded-2xl shadow-lg hover:shadow-primary/20 active:scale-[0.98] transition-all flex justify-center items-center gap-2 group ${status === 'success' ? 'bg-secondary text-white' : 'bg-primary-container text-on-primary-container hover:shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]'} ${status === 'submitting' || isSubmitting ? 'opacity-80' : ''}`}
+                                    type="submit"
+                                    disabled={status === 'submitting' || isSubmitting}
+                                >
+                                    {status === 'idle' && 'Login'}
+                                    {(status === 'submitting' || isSubmitting) && (
+                                        <>
+                                            <span className="material-symbols-outlined animate-spin">progress_activity</span>
+                                            Logging in...
+                                        </>
+                                    )}
+                                    {status === 'success' && 'Success! Redirecting...'}
                                     <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
                                 </button>
                             </form>
@@ -120,10 +192,12 @@ function Login() {
                                 Sign in with Google
                             </button>
 
-                            <p className="text-center font-body-md text-on-surface-variant">
-                                Don't have an account?
-                                <a className="text-primary font-bold hover:underline ml-1 transition-all" href="#">Sign Up</a>
-                            </p>
+                            <div onClick={() => navigate('/register')} className="text-center">
+                                <p className="font-body-md text-on-surface-variant">
+                                    Don't have an account?
+                                    <a onClick={() => navigate('/register')} className="text-primary font-bold hover:underline ml-1 transition-all" href="#">Sign Up</a>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -132,5 +206,6 @@ function Login() {
             <Footer />
         </div>
     );
-};
+}
+
 export default Login;
