@@ -1,5 +1,47 @@
 import { supabase } from '../lib/supabaseClient';
 
+export const completeUser = async ({ id, grade, curriculum, province, school, subjects }) => {
+    const res = await fetch('http://localhost:8000/api/users/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            id,
+            grade,
+            curriculum,
+            province,
+            school,
+            subjects,
+        }),
+    });
+
+    if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Failed to complete profile to backend: ${errorText}`);
+    }
+
+    return res.json();
+};
+
+export const getCurrentUserId = async () => {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+    if (sessionError) {
+        throw sessionError;
+    }
+
+    if (session?.user?.id) {
+        return session.user.id;
+    }
+
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError) {
+        throw userError;
+    }
+
+    return user?.id ?? null;
+};
+
 export const registerUser = async ({ firstName, surname, email, password }) => {
     const { data, error: authError } = await supabase.auth.signUp({
         email,
@@ -48,3 +90,4 @@ export const loginUser = async ({ email, password }) => {
 
     return data;
 };
+

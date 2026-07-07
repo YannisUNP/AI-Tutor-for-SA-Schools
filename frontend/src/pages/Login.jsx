@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Header from '../components/landing/Header';
 import Footer from '../components/landing/Footer';
 import { loginUser } from '../services/authService';
+import { supabase } from '../lib/supabaseClient';
 
 const loginSchema = z.object({
     email: z.string().min(1, 'Email is required').email('Invalid email address format'),
@@ -50,12 +51,17 @@ function Login() {
 
         try {
             setFormData((prev) => ({ ...prev, ...data }));
-            await loginUser({
+            const authResult = await loginUser({
                 email: data.email,
                 password: data.password,
             });
+
+            const { data: sessionData } = await supabase.auth.getSession();
+            const userId = sessionData?.session?.user?.id || authResult?.user?.id;
+            const onboardingCompleted = userId ? localStorage.getItem(`study_mate_onboarding_${userId}`) === 'true' : false;
+
             setStatus('success');
-            setTimeout(() => navigate('/dashboard'), 1000);
+            setTimeout(() => navigate(onboardingCompleted ? '/dashboard' : '/onboarding'), 1000);
         } catch (err) {
             const message = err?.message || 'Login failed. Please try again.';
             setAuthError(message);
