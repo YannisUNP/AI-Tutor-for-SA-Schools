@@ -10,9 +10,9 @@ function TopAppBar() {
         const { data, status } = await dashboardSummary(user.id);
         const name = data.user[0].first_name;
         setFirstName(name);
-        console.log(name);
-        console.log(data.user[0]);  // First user object
-        console.log(data.stats);  // Stats array
+        // console.log(name);
+        // console.log(data.user[0]);  // First user object
+        // console.log(data.stats);  // Stats array
     }
 
     useEffect(() => {

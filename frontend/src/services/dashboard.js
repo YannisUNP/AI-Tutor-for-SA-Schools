@@ -1,7 +1,6 @@
 import { supabase } from "../lib/supabaseClient";
 
 export const dashboardSummary = async(id) =>{
-    console.log("ID in question, ", id);
     const result = await fetch(`http://localhost:8000/api/dashboard/summary?user_id=${id}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },

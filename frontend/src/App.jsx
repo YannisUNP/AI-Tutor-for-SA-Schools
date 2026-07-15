@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import StudentOnboarding from './pages/StudentOnboarding';
+import AITutor from './pages/AITutor';
+import SidebarNavigation from './components/dashboard/SidebarNavigation';
 import { supabase } from './lib/supabaseClient';
 import { AuthProvider } from './contexts/AuthContext';
 
@@ -62,30 +64,36 @@ function App() {
   };
 
   return (
-    <div className="bg-surface text-on-surface">
+    <div className="bg-surface text-on-surface flex h-screen overflow-hidden">
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route
-              path="/onboarding"
-              element={
-                <ProtectedRoute session={session} loading={loading}>
-                  {onboardingComplete ? <Navigate to="/dashboard" replace /> : <StudentOnboarding onComplete={handleOnboardingComplete} />}
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute session={session} loading={loading}>
-                  {onboardingComplete ? <Dashboard /> : <Navigate to="/onboarding" replace />}
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
+          {/* Sidebar Navigation stays fixed, but we add a wrapper for the content */}
+          <SidebarNavigation />
+
+          <main className="flex-1 h-full overflow-y-auto">
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route
+                path="/onboarding"
+                element={
+                  <ProtectedRoute session={session} loading={loading}>
+                    {onboardingComplete ? <Navigate to="/dashboard" replace /> : <StudentOnboarding onComplete={handleOnboardingComplete} />}
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute session={session} loading={loading}>
+                    {onboardingComplete ? <Dashboard /> : <Navigate to="/onboarding" replace />}
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/tutor" element={<AITutor />} />
+            </Routes>
+          </main>
         </AuthProvider>
       </BrowserRouter>
     </div>

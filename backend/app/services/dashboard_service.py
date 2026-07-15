@@ -13,3 +13,8 @@ def dashboard_summary(user_id: str):
         "user": profile.data,
         "stats": stats.data
     }
+    
+
+    
+    
+    

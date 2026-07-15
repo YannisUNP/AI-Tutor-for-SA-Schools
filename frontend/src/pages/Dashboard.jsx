@@ -18,7 +18,7 @@ function Dashboard() {
     const { useState, useEffect } = React;
     return (
         <div className="flex w-full h-full overflow-hidden">
-            <SidebarNavigation />
+            
 
             {/* Main Content Canvas */}
             <main className="flex-1 h-screen overflow-y-auto custom-scrollbar bg-background">

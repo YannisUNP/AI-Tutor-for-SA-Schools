@@ -38,3 +38,4 @@ def complete_user_profile(profile):
     ).execute()
 
     return rpc_result
+
